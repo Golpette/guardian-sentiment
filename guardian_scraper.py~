@@ -34,12 +34,21 @@ import plotting
 
 ##############################################
 URL = "https://www.theguardian.com/"
+#THEME = "politics"
 #THEMES = ['world', 'sport']
 THEMES = ['world', 'politics', 'books/2018', 
         'sport', 'film', 'environment']
 NO_URLS = 50
-##############################################
 
+WORDCLOUD_FILENAME = "wordcloud.png"
+MASK_IMG = "g_icon.png"
+
+BOKEH_FILENAME = "word-occurrences.html"
+MAX_WORDS_TO_DISPLAY = 50
+
+ARTICLE_SENTIMENTS = "article_sentiments.csv"
+SENTIMENT_HISTO = 'sentiments.png'
+##############################################
 
 def scrape_links( page ):
     """Retrieve all Guardian article links from current page"""
