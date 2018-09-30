@@ -1,20 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 ######################################################
-# Analyses of all stories reachable from home page
-# (1) Wordcloud
-# (2) Bokeh plot of word rank vs occurrence
-# (3) Use VADER sentiment analysis to score articles
+# Scraping set number of urls from specifiec news 
+# themes. Save url, text, date, theme to a csv file
 ######################################################
-#TODO:
-# Could ignore "live update" stuff, as not technically articles
-# Recover the first letter of article
-# Alter stopwords to improve wordclouds
-
 
 import sys
-sys.dont_write_bytecode = True
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -116,12 +107,10 @@ def spider_scrape_theme( start_page, theme, max_urls ):
         # Keep punctuation for sentiment analysis
         article_tidy = gt.tidy_article_allow_punct( article_raw )
         if len(article_tidy.split())>20:
-            data_list.append( {"theme":theme.lower(), "url":url, "article":article_tidy, "length":len(article_tidy.split())} )
+            data_list.append( {"date":date, "theme":theme.lower(), "url":url, "article":article_tidy, "length":len(article_tidy.split())} )
             articles_found += 1
             if (articles_found%5==0):
                 print theme, ": articles =", articles_found
-
-
 
 
 def get_date_published( link ):
@@ -137,10 +126,7 @@ def get_date_published( link ):
             next_line = True   
     return date
 
-
 ###################################
-
-
 
 
 

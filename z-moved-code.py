@@ -1,6 +1,10 @@
+#TODO:
+# Could ignore "live update" stuff, as not technically articles
+# Recover the first letter of article
+# Alter stopwords to improve wordclouds
 
-    #stopwords = read_stopwords('stopwords.txt')
 
+#stopwords = read_stopwords('stopwords.txt')
 
 
 WORDCLOUD_FILENAME = "wordcloud.png"
