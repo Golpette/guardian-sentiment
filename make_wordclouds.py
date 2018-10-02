@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-import guardian_text as gt
+import text_processing as tp
 
 MASK_IMG = "g_icon.png"
 DATAFILE = "scraped_data.csv"
@@ -112,7 +112,7 @@ def main():
             all_articles = all_articles+" "+data["article"]
 
         # Lose punctuation for wordlcouds
-        all_articles = gt.tidy_article( all_articles ).lower()
+        all_articles = tp.tidy_article( all_articles ).lower()
 
         # Dict with words and counts
         word_occurrences_no_stopwords = {}

@@ -18,7 +18,7 @@ import urllib
 import re 
 # My modules
 import make_wordcloud
-import guardian_text as gt
+import text_processing as tp
 import plotting
 
 ##############################################
@@ -100,10 +100,10 @@ def spider_scrape_theme( start_page, theme, max_urls ):
         visited.append( url )
         to_visit += get_related_links( url, theme, to_visit, visited )
 
-        article_raw = gt.get_article_content( url )
+        article_raw = tp.get_article_content( url )
         date = get_date_published( url )
         # Keep punctuation for sentiment analysis
-        article_tidy = gt.tidy_article_allow_punct( article_raw )
+        article_tidy = tp.tidy_article_allow_punct( article_raw )
         if len(article_tidy.split())>20:
             data_list.append( {"date":date, "theme":theme.lower(), "url":url, "article":article_tidy, "length":len(article_tidy.split())} )
             articles_found += 1
