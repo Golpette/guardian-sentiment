@@ -16,6 +16,13 @@ MAX_WORDS_TO_DISPLAY = 50
 ARTICLE_SENTIMENTS = "article_sentiments.csv"
 SENTIMENT_HISTO = 'sentiments.png'
 
+######################################################
+# Analyses of all articles in csv file
+# (1) Wordclouds
+# (2) Bokeh plots of word rank vs occurrence
+# (3) VADER sentiment analysis across news themes
+######################################################
+
 
 
 
