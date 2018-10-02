@@ -18,9 +18,7 @@ import urllib
 import re 
 # My modules
 import make_wordcloud
-import guardian_scraper as gs
 import guardian_text as gt
-import vader_sentiment as vs
 import plotting
 
 ##############################################

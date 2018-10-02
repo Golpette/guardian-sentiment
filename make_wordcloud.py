@@ -1,8 +1,21 @@
+#####################################
+# Make wordclouds of each news theme
+#####################################
+
 from wordcloud import WordCloud
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
+import guardian_text as gt
+
+MASK_IMG = "g_icon.png"
+DATAFILE = "scraped_data.csv"
+OUT_ROOT = "wordcloud_"
+
+
+###################
 
 def transform_format(val):
     """Transform B&W (True,False) to (255,1)"""
@@ -23,7 +36,7 @@ def mask_from_bw( BW_img ):
 
 
 
-def with_mask( word_occurrence, mask_img, output_file ):
+def wordcloud_with_mask( word_occurrence, mask_img, output_file ):
     """Make wordcloud using dict of word occurrences and mask"""
 
     mask = mask_from_bw( mask_img )
@@ -42,3 +55,87 @@ def with_mask( word_occurrence, mask_img, output_file ):
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
     #plt.show()
+
+
+
+def accumulate_words( text, worddic, stopwords=None ):
+    """ Count and store occurrences of each word in a dictionary"""   
+    words = text.split()
+    if stopwords is None:
+        for word in words:
+            # Remove numbers, hashtags and emails
+            #if not any(char.isdigit() for char in word) and '#' not in word and '@' not in word:    ## DO THIS IN TIIDY METHOD
+            if word in worddic:
+                worddic[ word ] += 1
+            else:
+                worddic[ word ] = 1
+    else:
+        for word in words:
+            if word in worddic and word not in stopwords:
+                worddic[ word ] += 1
+            elif word not in stopwords:
+                worddic[ word ] = 1
+
+    return worddic
+
+
+
+def read_stopwords(filename):
+    """Read file with 1 stopword/line"""
+    stopwords=[]
+    file = open(filename, 'r')  
+    for line in file:
+        stopwords.append( line.strip() )
+    return stopwords
+
+
+
+
+
+
+def main():
+
+    stopwords = read_stopwords("stopwords.txt")
+
+    df = pd.read_csv(DATAFILE)
+
+    groups = df.groupby("theme")
+    
+    for name,grp in groups:
+        
+        fileout = OUT_ROOT + name + ".png"
+
+        all_articles = ""
+        # Join all articles
+        #articles = grp["article"].agg(lambda x: ' '.join(x))
+        for row,data in grp.iterrows():
+            all_articles = all_articles+" "+data["article"]
+
+        # Lose punctuation for wordlcouds
+        all_articles = gt.tidy_article( all_articles ).lower()
+
+        # Dict with words and counts
+        word_occurrences_no_stopwords = {}
+        word_occurrences_no_stopwords = accumulate_words( all_articles, 
+                                word_occurrences_no_stopwords, stopwords )
+
+        #Make wordcloud and save as png
+        wordcloud_with_mask( word_occurrences_no_stopwords, MASK_IMG, fileout )       
+        
+
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
