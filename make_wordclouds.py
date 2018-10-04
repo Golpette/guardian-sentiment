@@ -2,6 +2,8 @@
 # Make wordclouds of each news theme
 #####################################
 
+import sys; sys.dont_write_bytecode=True
+
 from wordcloud import WordCloud
 from PIL import Image
 import numpy as np

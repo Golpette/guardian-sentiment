@@ -6,6 +6,7 @@
 ######################################################
 
 import sys
+sys.dont_write_bytecode = True
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -17,16 +18,15 @@ import urllib2
 import urllib    
 import re 
 # My modules
-import make_wordcloud
 import text_processing as tp
-import plotting
+
 
 ##############################################
 URL = "https://www.theguardian.com/"
 #THEMES = ['world', 'sport']
-THEMES = ['world', 'politics', 'books/2018', 
-        'sport', 'film', 'environment']
-NO_URLS = 50
+THEMES = ["world", "politics", "books", 
+        "sport", "film", "environment"]
+NO_URLS = 100
 ##############################################
 
 
@@ -101,11 +101,11 @@ def spider_scrape_theme( start_page, theme, max_urls ):
         to_visit += get_related_links( url, theme, to_visit, visited )
 
         article_raw = tp.get_article_content( url )
-        date = get_date_published( url )
+        ###date = get_date_published( url )
         # Keep punctuation for sentiment analysis
         article_tidy = tp.tidy_article_allow_punct( article_raw )
         if len(article_tidy.split())>20:
-            data_list.append( {"date":date, "theme":theme.lower(), "url":url, "article":article_tidy, "length":len(article_tidy.split())} )
+            data_list.append( {"theme":theme.lower(), "url":url, "article":article_tidy, "length":len(article_tidy.split())} )
             articles_found += 1
             if (articles_found%5==0):
                 print theme, ": articles =", articles_found

@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+##################################
+# Bokeh html plot showing word
+# frequencies across topics
+##################################
+import sys; sys.dont_write_bytecode=True
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -27,13 +35,18 @@ MAX_WORDS = 50
 
 
 
-def bokeh_wordcount( ranked_dataframe, max_words, fileout):
+def bokeh_wordcount( ranked_dataframe, fileout, max_words=None):
     """Make bokeh html plot of word occurrences"""
-    p = figure(x_axis_label='Rank', y_axis_label='Count', y_axis_type='log')
-    #Only use 100 higest ranking words
-    p.circle('rank', 'count', size=10, alpha=0.4, 
-            color='forestgreen', source=ranked_dataframe[:max_words])
-    hover = HoverTool(tooltips=[('token','@index')])
+
+    if max_words==None:
+        max_words = len(ranked_dataframe.index)-1
+
+    p = figure(x_axis_label="Rank", y_axis_label="Count", 
+            y_axis_type="log", x_axis_type="log")
+    #Only higest ranking words
+    p.circle("rank", "count", size=10, alpha=0.4, 
+            color="forestgreen", source=ranked_dataframe[:max_words])
+    hover = HoverTool(tooltips=[("token","@index")])
     p.add_tools(hover)
 
     html = file_html(p, CDN, "Word occurrences")
@@ -105,12 +118,11 @@ def main():
     figs_grid = []
 
     colors = itertools.cycle(palette)    
+    all_words = {}
 
     
     for (name,grp),color in zip(groups,colors):
         
-        fileout = OUT_ROOT + name + ".html"
-
         all_articles = ""
         # Join all articles
         #articles = grp["article"].agg(lambda x: ' '.join(x))
@@ -120,34 +132,44 @@ def main():
         # Lose punctuation for wordlcouds
         all_articles = tp.tidy_article( all_articles ).lower()
 
+        # Bokeh only accepts ascii (or utf-8???)
+        all_articles = all_articles.decode("ascii", errors="ignore").encode()
+
+        # All words for Zipfs law, including stopwords
+        all_words = accumulate_words( all_articles, all_words )
+
         # Dict with words and counts
         word_occurrences_no_stopwords = {}
         word_occurrences_no_stopwords = accumulate_words( all_articles, 
                                 word_occurrences_no_stopwords, stopwords )
 
-        #Make dataframe from dic and sort it by rank
         ranked_df = make_ranked_df( word_occurrences_no_stopwords )
-        ranked_df = ranked_df.sort_values('rank', axis=0)
-        
-        #Make interactive Bokeh plot and save as html
-        #bokeh_wordcount( ranked_df, MAX_WORDS, fileout )
-
+        ranked_df = ranked_df.sort_values("rank", axis=0)
 
         # Make list of plots for gridplot layout        
-        p = figure(x_axis_label='Rank', y_axis_label='Count', 
-                y_axis_type='log', title=name)
-        p.circle('rank', 'count', size=10, alpha=0.6, 
+        p = figure(x_axis_label="Rank", y_axis_label="Count", 
+                y_axis_type="log", title=name)
+        p.circle("rank", "count", size=10, alpha=0.6, 
                 color=color, source=ranked_df[:MAX_WORDS])    #'forestgreen'
-        hover = HoverTool(tooltips=[('token','@index')])
+        hover = HoverTool(tooltips=[("token","@index")])
         p.add_tools(hover)
         figs_grid.append(p)
+
+
+        # -- Each topic
+        #fileout = OUT_ROOT + name + ".html"
+        #Make dataframe from dic and sort it by rank
+        #ranked_df = make_ranked_df( word_occurrences_no_stopwords )
+        #ranked_df = ranked_df.sort_values("rank", axis=0)
+        #
+        #Make interactive Bokeh plot and save as html
+        #bokeh_wordcount( ranked_df, fileout, MAX_WORDS )
 
 
 
 
     # put all the plots in a grid layout
     gridfig = gridplot( [ figs_grid[0:3], figs_grid[3:6] ] )
-
     html = file_html(gridfig, CDN, "Word occurrences")
     f = open( OUTPUT, 'w')
     f.write( html )
@@ -157,6 +179,15 @@ def main():
     #show(gridfig)
 
 
+    #Make Bokeh plot for Zipfs law of all articles
+    rank_df = make_ranked_df( all_words )
+    rank_df = rank_df.sort_values("rank", axis=0)
+
+    #print rank_df
+    #exit(0)
+
+
+    bokeh_wordcount( rank_df, "zipf.html" )
 
 
  
