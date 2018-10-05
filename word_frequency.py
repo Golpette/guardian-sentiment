@@ -123,13 +123,13 @@ def main():
     
     for (name,grp),color in zip(groups,colors):
         
-        all_articles = ""
-        # Join all articles
-        #articles = grp["article"].agg(lambda x: ' '.join(x))
-        for row,data in grp.iterrows():
-            all_articles = all_articles+" "+data["article"]
+        # Join all articles in theme
+        all_articles = grp["article"].str.cat(sep=" ")
+        #all_articles = ""
+        #for row,data in grp.iterrows():
+        #    all_articles = all_articles+" "+data["article"]
 
-        # Lose punctuation for wordlcouds
+        # Drop punctuation for word freqs
         all_articles = tp.tidy_article( all_articles ).lower()
 
         # Bokeh only accepts ascii (or utf-8???)
@@ -182,11 +182,6 @@ def main():
     #Make Bokeh plot for Zipfs law of all articles
     rank_df = make_ranked_df( all_words )
     rank_df = rank_df.sort_values("rank", axis=0)
-
-    #print rank_df
-    #exit(0)
-
-
     bokeh_wordcount( rank_df, "zipf.html" )
 
 

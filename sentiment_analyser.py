@@ -44,8 +44,7 @@ def mean_sentiment_from_sentences( text ):
 
 def compound_alter_alpha( compound, alpha ):
     """ Recalculate compound sentiment with altered alpha parameter
- 
-        In the VADER normalisation alpha is hardcoded as 15.      
+        In VADER, normalisation alpha is hardcoded as 15.      
     """ 
     # Normalisation: compound = x / sqrt( x**2 + alpha ), where x is 
     # sum of individual lexicon sentiments scores 
@@ -70,7 +69,9 @@ def main():
 
     # Make violin plots for each theme
     ncols = 3
-    f, axes = plt.subplots(nrows=2, ncols=ncols)
+    a4_dims = (11.7, 8.27)
+    f, axes = plt.subplots(nrows=2, ncols=ncols, figsize=a4_dims)
+    #fig.set_size_inches(11.7, 8.27)
     for i,(nm,grp) in enumerate(groups):
         sns.violinplot(  y=STAT, data=grp, ax=axes[i//ncols][i%ncols], inner=None, alpha=0.5)
         sns.swarmplot(  y=STAT, data=grp , ax=axes[i//ncols][i%ncols], alpha=0.9, color="black")

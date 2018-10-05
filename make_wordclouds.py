@@ -107,11 +107,11 @@ def main():
         
         fileout = OUT_ROOT + name + ".png"
 
-        all_articles = ""
-        # Join all articles
-        #articles = grp["article"].agg(lambda x: ' '.join(x))
-        for row,data in grp.iterrows():
-            all_articles = all_articles+" "+data["article"]
+        # Join all articles in theme
+        all_articles = grp["article"].str.cat(sep=" ")
+        #all_articles = ""
+        #for row,data in grp.iterrows():
+        #    all_articles = all_articles+" "+data["article"]
 
         # Lose punctuation for wordlcouds
         all_articles = tp.tidy_article( all_articles ).lower()
