@@ -14,7 +14,7 @@ from nltk.tokenize import sent_tokenize
 import math
 
 DATAFILE = "data/scraped_data.csv"
-OUTPUT = "guardian_senitments.png"
+OUTPUT = "guardian_sentiments.png"
 
 STAT = "mean_sentence"
 
