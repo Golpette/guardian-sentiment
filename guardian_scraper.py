@@ -14,19 +14,21 @@ import numpy as np
 import math
 # Regexp and scraping
 from bs4 import BeautifulSoup
-import urllib2
-import urllib    
+import urllib.request
 import re 
 # My modules
 import text_processing as tp
 
+import time
+
 
 ##############################################
 URL = "https://www.theguardian.com/"
-#THEMES = ['world', 'sport']
+
 THEMES = ["world", "politics", "books", 
         "sport", "film", "environment"]
-NO_URLS = 100
+
+NO_URLS = 50
 ##############################################
 
 
@@ -34,7 +36,7 @@ def scrape_links( page ):
     """Retrieve all Guardian article links from current page"""
     #Ignore /info/ and /help/ links
     to_visit = []
-    resp = urllib2.urlopen( page )
+    resp = urllib.request.urlopen( page )
     soup = BeautifulSoup(resp, 'lxml')
     for link in soup.find_all('a', href=True):
         if( '//www.theguardian' in link['href'].lower() ):
@@ -52,19 +54,20 @@ def get_related_links( page, theme, to_visit, visited ):
     """
     theme = "/"+theme.lower()+"/"
     links_found=[]
-    #print page
+    print(page)
     try:
-        resp = urllib2.urlopen( page )
+        resp = urllib.request.urlopen( page )
         soup = BeautifulSoup(resp, 'lxml')
         for link in soup.find_all('a', href=True):
+            # Only take links likely to be a news story
             if theme in link['href'].lower() and '//www.theguardian' in link['href'].lower():
                 if( '/help/' not in link['href'].lower() and '/info/' not in link['href'].lower() ):
                     if( link['href'] not in to_visit and link['href'] not in visited
                             and link['href'] not in links_found):
                         links_found.append( link['href'] )
-    except urllib2.HTTPError:
+    except urllib.request.HTTPError:
         # Dead link found 
-        print "dead link"
+        print("dead link")
     return links_found
 
 
@@ -84,7 +87,6 @@ def spider_scrape_theme( start_page, theme, max_urls ):
     to_visit = get_related_links( start_page, theme, to_visit, visited )
 
     while articles_found < max_urls+1:
-
         # collect as many urls as possible up to twice the desired amount
         #  - some collected won't be articles
         if len(to_visit)==0 or articles_found==max_urls:
@@ -101,6 +103,7 @@ def spider_scrape_theme( start_page, theme, max_urls ):
         to_visit += get_related_links( url, theme, to_visit, visited )
 
         article_raw = tp.get_article_content( url )
+
         ###date = get_date_published( url )
         # Keep punctuation for sentiment analysis
         article_tidy = tp.tidy_article_allow_punct( article_raw )
@@ -108,12 +111,13 @@ def spider_scrape_theme( start_page, theme, max_urls ):
             data_list.append( {"theme":theme.lower(), "url":url, "article":article_tidy, "length":len(article_tidy.split())} )
             articles_found += 1
             if (articles_found%5==0):
-                print theme, ": articles =", articles_found
+                print( "{}: articles={}".format(theme,articles_found) )
+
 
 
 def get_date_published( link ):
     """ Get article's publish date """
-    ol = urllib.urlopen( link )
+    ol = urllib.request.urlopen( link )
     date = ""
     next_line = False
     for line in ol:
@@ -129,6 +133,8 @@ def get_date_published( link ):
 
 
 def main():
+
+    starttime = time.perf_counter()
 
     frames = []
     for theme in THEMES:
@@ -147,12 +153,15 @@ def main():
     df = pd.concat( frames )
     df.to_csv( "scraped_data.csv" )
 
+    endtime = time.perf_counter()
+
+    print("Time = {} mins".format((endtime-starttime)/60.0) )
+    
 
 
-
-if __name__ == "__main__":
-   # stuff only to run when not called via 'import' here
-   main()
+if __name__=="__main__":
+    # stuff only to run when not called via 'import' here
+    main()
 
 
 

@@ -12,10 +12,10 @@ import pandas as pd
 
 import text_processing as tp
 
-MASK_IMG = "g_icon.png"
-DATAFILE = "scraped_data.csv"
-OUT_ROOT = "wordcloud_"
+MASK_IMG = "data/g_icon.png"
+DATAFILE = "data/scraped_data.csv"
 
+OUT_ROOT = "wordcloud_"
 
 ###################
 
@@ -54,7 +54,7 @@ def wordcloud_with_mask( word_occurrence, mask_img, output_file ):
     #max_font_size=200,
     wordcloud.to_file( output_file )
     plt.figure(figsize=(12,10)) #Make this match size of the mask
-    plt.imshow(wordcloud, interpolation="bilinear")
+    ##plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
     #plt.show()
 
@@ -95,15 +95,23 @@ def read_stopwords(filename):
 
 
 
-def main():
+def main( datafile=None ):
 
-    stopwords = read_stopwords("stopwords.txt")
+    if datafile is None:
+        print("Using example data file")
+        datafile = DATAFILE
 
-    df = pd.read_csv(DATAFILE)
+    stopwords = read_stopwords("data/stopwords.txt")
+
+    df = pd.read_csv(datafile)
 
     groups = df.groupby("theme")
+
+    
     
     for name,grp in groups:
+    
+        print("name = {}".format(name))
         
         fileout = OUT_ROOT + name + ".png"
 
@@ -124,10 +132,6 @@ def main():
         #Make wordcloud and save as png
         wordcloud_with_mask( word_occurrences_no_stopwords, MASK_IMG, fileout )       
         
-
-
-
-
 
 
 

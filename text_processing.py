@@ -3,19 +3,20 @@
 
 # Regexp and scraping
 from bs4 import BeautifulSoup
-import urllib2
-import urllib    
+import requests
 import re 
 
 
 def get_article_content( link ):
     """ Get single String of article body from URL """
-    ol = urllib.urlopen( link )
+    page = requests.get(link).text
+    lines = page.split("\n")
+
     article = ""
     article_started = False
     article_finished = False
 
-    for line in ol:
+    for line in lines:
         if 'itemprop="articleBody' in line:
             article_started = True
         if 'class="after-article' in line:

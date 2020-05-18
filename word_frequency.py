@@ -25,7 +25,7 @@ import text_processing as tp
 
 
 
-DATAFILE = "scraped_data.csv"
+DATAFILE = "data/scraped_data.csv"
 OUT_ROOT = "word_freq_"
 OUTPUT = "word_frequencies.html"
 MAX_WORDS = 50
@@ -83,7 +83,9 @@ def make_ranked_df( dic ):
     new_dic={}
     rank=0
     # Sort by value and add rank to new dictionary
-    for key,value in sorted(dic.iteritems(), key=lambda (k,v): v, reverse=True):
+    #for key,value in sorted(dic.iteritems(), key=lambda (k,v): v, reverse=True):
+    for key in sorted(dic, key=dic.get, reverse=True):
+        value = dic[key]
         rank += 1
         new_dic[key]=[rank,value]
     #Make pandas df from this
@@ -106,13 +108,16 @@ def read_stopwords(filename):
 
 
 
-def main():
+def main( datafile=None ):
 
-    stopwords = read_stopwords("stopwords.txt")
+    if datafile is None:
+        print("word_freuency.py using example data set")
+        datafile = DATAFILE
 
-    df = pd.read_csv(DATAFILE)
-
+    df = pd.read_csv(datafile)
     groups = df.groupby("theme")
+
+    stopwords = read_stopwords("data/stopwords.txt")
 
     #List of figs for gridplot
     figs_grid = []
@@ -125,15 +130,9 @@ def main():
         
         # Join all articles in theme
         all_articles = grp["article"].str.cat(sep=" ")
-        #all_articles = ""
-        #for row,data in grp.iterrows():
-        #    all_articles = all_articles+" "+data["article"]
 
         # Drop punctuation for word freqs
         all_articles = tp.tidy_article( all_articles ).lower()
-
-        # Bokeh only accepts ascii (or utf-8???)
-        all_articles = all_articles.decode("ascii", errors="ignore").encode()
 
         # All words for Zipfs law, including stopwords
         all_words = accumulate_words( all_articles, all_words )
@@ -147,8 +146,10 @@ def main():
         ranked_df = ranked_df.sort_values("rank", axis=0)
 
         # Make list of plots for gridplot layout        
+        #p = figure(x_axis_label="Rank", y_axis_label="Count", 
+        #        x_axis_type="log", y_axis_type="log", title=name)
         p = figure(x_axis_label="Rank", y_axis_label="Count", 
-                y_axis_type="log", title=name)
+                title=name)
         p.circle("rank", "count", size=10, alpha=0.6, 
                 color=color, source=ranked_df[:MAX_WORDS])    #'forestgreen'
         hover = HoverTool(tooltips=[("token","@index")])
@@ -185,8 +186,6 @@ def main():
     bokeh_wordcount( rank_df, "zipf.html" )
 
 
- 
-        
 
 
 if __name__ == "__main__":
@@ -194,19 +193,3 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#df = pd.read_csv( "article_sentiments.csv" )
-#sentiment_hist( df, 'mean_sentence_compound', 10, "out.png")

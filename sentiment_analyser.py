@@ -13,8 +13,9 @@ from vaderSentiment.vaderSentiment  import SentimentIntensityAnalyzer
 from nltk.tokenize import sent_tokenize
 import math
 
-DATAFILE = "scraped_data.csv"
+DATAFILE = "data/scraped_data.csv"
 OUTPUT = "guardian_senitments.png"
+
 STAT = "mean_sentence"
 
 
@@ -30,7 +31,8 @@ def mean_sentiment_from_sentences( text ):
     """Use nltk to tokenize to sentences and return
      mean compound score"""
     #Tokenizer only accepts ascii 
-    sentences = sent_tokenize( text.decode("ascii", errors="ignore").encode() )
+    #sentences = sent_tokenize( text.decode("ascii", errors="ignore").encode() )
+    sentences = sent_tokenize( text )
     #sentence_scores = []
     list_compound_scores = []
     for sentence in sentences:
@@ -57,10 +59,13 @@ def compound_alter_alpha( compound, alpha ):
 
 
 
-def main():
+def main( datafile=None ):
 
     # Read in csv
-    df = pd.read_csv(DATAFILE)
+    if datafile is None:
+        print("Sentiment anlyser using example dataset")
+        datafile = DATAFILE
+    df = pd.read_csv(datafile)
 
     # Add column with mean sentence compound sentiment
     df[STAT] = df['article'].map( lambda x: mean_sentiment_from_sentences(x) )
@@ -81,8 +86,7 @@ def main():
     f.tight_layout()
 
     plt.savefig(OUTPUT)
-
-    plt.show()
+    ##plt.show()
 
 
 
