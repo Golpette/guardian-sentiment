@@ -20,7 +20,7 @@ The analysis will take a few minutes to run, and generate:
 
 Violin plots from the sentiment analysis of each theme:
 
-![](/exampleoutput/guardian_sentiment.png)  
+![](/exampleoutput/guardian_sentiments.png)  
 
 Wordclouds for each theme:
 
@@ -28,8 +28,8 @@ Wordclouds for each theme:
 
 
 Interactive word frequency plots like 
-[this](http://htmlpreview.github.io/?https://github.com/Golpette/guardian-sentiment/exampleoutput/word_frequencies.html)
-and [this](http://htmlpreview.github.io/?https://github.com/Golpette/guardian-sentiment/exampleoutput/zipf.html).
+[this](https://htmlpreview.github.io/?https://github.com/Golpette/guardian-sentiment/exampleoutput/word_frequencies.html)
+and [this](https://htmlpreview.github.io/?https://github.com/Golpette/guardian-sentiment/exampleoutput/zipf.html).
 
 
 
